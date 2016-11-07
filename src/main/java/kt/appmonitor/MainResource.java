@@ -6,6 +6,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 @Path("v1")
@@ -24,6 +25,12 @@ public class MainResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getIt() {
-        return "Hello, Heroku! [" + servletContext.getServerInfo() + ']';
+		HealthMonitorService service = getHealthMonitorService();
+        return "Hello, Heroku! [" + service + ']';
     }
+	
+	private HealthMonitorService getHealthMonitorService() {
+		return WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
+				.getBean(HealthMonitorService.class);
+	}
 }
