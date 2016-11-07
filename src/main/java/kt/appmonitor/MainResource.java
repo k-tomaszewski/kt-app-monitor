@@ -1,5 +1,6 @@
 package kt.appmonitor;
 
+import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -10,23 +11,17 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 @Path("v1")
+@Produces(MediaType.APPLICATION_JSON)
 public class MainResource {
 	
 	@Context
 	private ServletContext servletContext;
 
 	
-    /**
-     * Method handling HTTP GET requests. The returned object will be sent
-     * to the client as "text/plain" media type.
-     *
-     * @return String that will be returned as a text/plain response.
-     */
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getIt() {
+    public Map<String, Object> getStatus() {
 		HealthMonitorService service = getHealthMonitorService();
-        return "Hello, Heroku! [" + service + ']';
+		return service.getStatusVariables();
     }
 	
 	private HealthMonitorService getHealthMonitorService() {
