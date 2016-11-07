@@ -10,5 +10,10 @@
         http://www.springframework.org/schema/context/spring-context.xsd">
  
     <context:component-scan base-package="kt.appmonitor" />
+    
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="url" value="#{systemEnvironment['DATABASE_URL']}"/>
+    </bean>    
  
 </beans>
