@@ -1,11 +1,13 @@
 package kt.appmonitor;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 
@@ -13,10 +15,14 @@ import org.springframework.stereotype.Service;
 public class HealthMonitorService {
 	
 	private DateTime startTime;
-	
+	/*
 	@Autowired
 	private DataSource dataSource;
+	*/
 	
+	@Autowired
+	@Qualifier("dbUrl")
+	private URI dbUri;
 	
 	@PostConstruct
 	public void postConstruct() {
@@ -38,7 +44,9 @@ public class HealthMonitorService {
 		statusVariables.put("runtime CPU count", Runtime.getRuntime().availableProcessors());
 		statusVariables.put("runtime free memory", Runtime.getRuntime().freeMemory());
 		statusVariables.put("runtime total memory", Runtime.getRuntime().totalMemory());
-		statusVariables.put("data-source-class", dataSource.getClass().getName());
+		
+		statusVariables.put("dbURI", dbUri.toString());
+		//statusVariables.put("data-source-class", dataSource.getClass().getName());
 		
 		return statusVariables;
 	}
