@@ -47,6 +47,7 @@ public class HealthMonitorService {
 		
 		statusVariables.put("dbURI", dbUri.toString());
 		//statusVariables.put("data-source-class", dataSource.getClass().getName());
+		statusVariables.put("test-db-url", "jdbc:postgresql://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath());
 		
 		return statusVariables;
 	}
