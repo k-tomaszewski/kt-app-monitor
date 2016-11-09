@@ -24,6 +24,11 @@ public class HealthMonitorService {
 		System.out.println("HealthMonitorService created at " + startTime);
 	}
 	
+	public void updateAppAliveEntry(String appName, DateTime appTime) {
+		
+		System.out.println("appName: " + appName + ", appTime: " + appTime);
+	}
+	
 	public Map<String, Object> getStatusVariables() {
 		Map<String, Object> statusVariables = new TreeMap<>();
 		
