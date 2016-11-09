@@ -4,18 +4,11 @@ import org.joda.time.DateTime;
 
 
 public class AppHeartBeatDto {
-	
-	private String appName;
+
 	private DateTime timestamp;
-
 	
-	public String getAppName() {
-		return appName;
-	}
+	private byte[] signature;
 
-	public void setAppName(String appName) {
-		this.appName = appName;
-	}
 	
 	public DateTime getTimestamp() {
 		return timestamp;
@@ -23,5 +16,13 @@ public class AppHeartBeatDto {
 
 	public void setTimestamp(DateTime timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	public byte[] getSignature() {
+		return signature;
+	}
+
+	public void setSignature(byte[] signature) {
+		this.signature = signature;
 	}
 }

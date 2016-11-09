@@ -3,6 +3,7 @@ package kt.appmonitor;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.annotation.PostConstruct;
+import kt.appmonitor.dto.AppHeartBeatDto;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,9 +25,9 @@ public class HealthMonitorService {
 		System.out.println("HealthMonitorService created at " + startTime);
 	}
 	
-	public void updateAppAliveEntry(String appName, DateTime appTime) {
+	public void updateAppAliveEntry(String appName, AppHeartBeatDto heartBeatDto) {
 		
-		System.out.println("appName: " + appName + ", appTime: " + appTime);
+		System.out.println("appName: " + appName + ", timestamp: " + heartBeatDto.getTimestamp());
 	}
 	
 	public Map<String, Object> getStatusVariables() {
