@@ -3,9 +3,9 @@ package kt.appmonitor;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 
@@ -15,7 +15,7 @@ public class HealthMonitorService {
 	private DateTime startTime;
 
 	@Autowired
-	private DataSource dataSource;
+	private JdbcTemplate jdbcTemplate;
 	
 	
 	@PostConstruct
@@ -38,7 +38,6 @@ public class HealthMonitorService {
 		statusVariables.put("runtime CPU count", Runtime.getRuntime().availableProcessors());
 		statusVariables.put("runtime free memory", Runtime.getRuntime().freeMemory());
 		statusVariables.put("runtime total memory", Runtime.getRuntime().totalMemory());
-		statusVariables.put("data-source-class", dataSource.getClass().getName());
 		
 		return statusVariables;
 	}
