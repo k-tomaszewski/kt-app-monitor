@@ -1,5 +1,6 @@
 package kt.appmonitor;
 
+import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
@@ -10,6 +11,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import kt.appmonitor.data.AppAliveEntry;
 import kt.appmonitor.dto.AppHeartBeatDto;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -27,6 +29,12 @@ public class MainResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void updateAppAlive(@PathParam("appName") String appName, AppHeartBeatDto appHeartBeat) {
 		getHealthMonitorService().updateAppAliveEntry(appName, appHeartBeat);
+	}
+	
+	@GET
+	@Path("{appName}")
+	public List<AppAliveEntry> getAppAliveEntries(@PathParam("appName") String appName) {
+		return getHealthMonitorService().getAppAliveEntries(appName);
 	}
 	
     @GET
