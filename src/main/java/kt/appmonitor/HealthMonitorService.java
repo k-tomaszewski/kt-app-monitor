@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class HealthMonitorService {
 	
-	private static final RowMapper<AppAliveEntry> appAliveEntry = (ResultSet rs, int i) -> {
+	private static final RowMapper<AppAliveEntry> appAliveEntryRowMapper = (ResultSet rs, int i) -> {
 		DateTime fromTime = new DateTime(rs.getDate("START_DATETIME"));
 		DateTime endTime = new DateTime(rs.getDate("END_DATETIME"));
 		DateTime lastUpdateTime = new DateTime(rs.getDate("LAST_MOD_DATETIME"));
@@ -44,7 +44,7 @@ public class HealthMonitorService {
 	
 	public List<AppAliveEntry> getAppAliveEntries(String appName) {
 		return jdbcTemplate.query("select ID, START_DATETIME, END_DATETIME, LAST_MOD_DATETIME from app_alive where APP_NAME = ?",
-				new Object[]{appName}, appAliveEntry);
+				new Object[]{appName}, appAliveEntryRowMapper);
 	}
 	
 	public Map<String, Object> getStatusVariables() {
