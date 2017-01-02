@@ -1,7 +1,6 @@
 package kt.appmonitor;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -9,6 +8,8 @@ import javax.annotation.PostConstruct;
 import kt.appmonitor.data.AppAliveEntry;
 import kt.appmonitor.dto.AppHeartBeatDto;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class HealthMonitorService {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(HealthMonitorService.class);
 	
 	private static final RowMapper<AppAliveEntry> appAliveEntryRowMapper = (ResultSet rs, int i) -> {
 		DateTime fromTime = new DateTime(rs.getDate("START_DATETIME"));
@@ -38,8 +41,9 @@ public class HealthMonitorService {
 	}
 	
 	public void updateAppAliveEntry(String appName, AppHeartBeatDto heartBeatDto) {
+		LOG.info("updateAppAliveEntry => appName: {}, heartBeatDto: {}", appName, heartBeatDto);
 		
-		System.out.println("appName: " + appName + ", timestamp: " + heartBeatDto.getTimestamp());
+
 	}
 	
 	public List<AppAliveEntry> getAppAliveEntries(String appName) {

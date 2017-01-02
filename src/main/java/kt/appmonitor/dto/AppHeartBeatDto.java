@@ -1,6 +1,7 @@
 package kt.appmonitor.dto;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.joda.time.DateTime;
 
 
@@ -33,5 +34,24 @@ public class AppHeartBeatDto {
 
 	public void setSignature(byte[] signature) {
 		this.signature = signature;
+	}
+	
+	public String toString() {
+		final StringBuilder txt = new StringBuilder();
+		txt.append("timestamp: ").append(timestamp).append(", metrics: ");
+		if (metrics != null) {
+			txt.append("{").append(metrics.entrySet().stream()
+					.map((entry) -> entry.getKey() + ": " + entry.getValue()).collect(Collectors.joining(", ")))
+					.append("}");
+		} else {
+			txt.append("null");
+		}
+		txt.append("signature: ");
+		if (signature != null) {
+			txt.append("<").append(signature.length).append("B>");
+		} else {
+			txt.append("null");
+		}
+		return txt.toString();
 	}
 }
