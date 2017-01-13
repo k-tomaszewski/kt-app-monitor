@@ -38,7 +38,7 @@ public class AppHeartBeatDto {
 	
 	public String toString() {
 		final StringBuilder txt = new StringBuilder();
-		txt.append("timestamp: ").append(timestamp).append(", metrics: ");
+		txt.append("{timestamp: ").append(timestamp).append(", metrics: ");
 		if (metrics != null) {
 			txt.append("{").append(metrics.entrySet().stream()
 					.map((entry) -> entry.getKey() + ": " + entry.getValue()).collect(Collectors.joining(", ")))
@@ -46,12 +46,13 @@ public class AppHeartBeatDto {
 		} else {
 			txt.append("null");
 		}
-		txt.append("signature: ");
+		txt.append(", signature: ");
 		if (signature != null) {
 			txt.append("<").append(signature.length).append("B>");
 		} else {
 			txt.append("null");
 		}
+		txt.append("}");
 		return txt.toString();
 	}
 }

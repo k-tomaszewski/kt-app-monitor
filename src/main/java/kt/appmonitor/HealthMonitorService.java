@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import javax.annotation.PostConstruct;
 import kt.appmonitor.data.AppAliveEntry;
 import kt.appmonitor.dto.AppHeartBeatDto;
+import kt.appmonitor.persistence.AppAliveEntryRepository;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +30,9 @@ public class HealthMonitorService {
 	};
 	
 	private DateTime startTime;
-
+	
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private AppAliveEntryRepository appAliveEntryRepo;
 	
 	
 	@PostConstruct
