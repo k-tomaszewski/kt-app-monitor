@@ -1,6 +1,5 @@
 package kt.appmonitor;
 
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -12,22 +11,14 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 public class HealthMonitorService {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(HealthMonitorService.class);
-	
-	private static final RowMapper<AppAliveEntry> appAliveEntryRowMapper = (ResultSet rs, int i) -> {
-		DateTime fromTime = new DateTime(rs.getDate("START_DATETIME"));
-		DateTime endTime = new DateTime(rs.getDate("END_DATETIME"));
-		DateTime lastUpdateTime = new DateTime(rs.getDate("LAST_MOD_DATETIME"));
-		return new AppAliveEntry(rs.getInt("ID"), fromTime, endTime, lastUpdateTime);
-	};
 	
 	private DateTime startTime;
 	
@@ -41,15 +32,23 @@ public class HealthMonitorService {
 		System.out.println("HealthMonitorService created at " + startTime);
 	}
 	
+	@Transactional
 	public void updateAppAliveEntry(String appName, AppHeartBeatDto heartBeatDto) {
 		LOG.info("updateAppAliveEntry => appName: {}, heartBeatDto: {}", appName, heartBeatDto);
 		
-
+		AppAliveEntry existingEntry = appAliveEntryRepo.findLastAppAliveEntry(appName);
+		if (existingEntry == null) {	// OR it is too old
+			appAliveEntryRepo.create(new AppAliveEntry(appName, heartBeatDto.getTimestamp(), heartBeatDto.getTimestamp(), DateTime.now()));
+		} else {
+			existingEntry.setAliveToTime(heartBeatDto.getTimestamp());
+			existingEntry.setLastModifiedTime(DateTime.now());
+			appAliveEntryRepo.update(existingEntry);
+		}
 	}
 	
+	@Transactional(readOnly = true)
 	public List<AppAliveEntry> getAppAliveEntries(String appName) {
-		return jdbcTemplate.query("select ID, START_DATETIME, END_DATETIME, LAST_MOD_DATETIME from app_alive where APP_NAME = ?",
-				new Object[]{appName}, appAliveEntryRowMapper);
+		return appAliveEntryRepo.findAppAliveEntries(appName);
 	}
 	
 	public Map<String, Object> getStatusVariables() {
