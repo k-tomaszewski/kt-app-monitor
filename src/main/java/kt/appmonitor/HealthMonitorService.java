@@ -29,7 +29,7 @@ public class HealthMonitorService {
 	@Autowired
 	private AppAliveEntryRepository appAliveEntryRepo;
 	
-	@Value("max-duration-beetween-heartbeats-str")
+	@Value("${max-duration-beetween-heartbeats-str}")
 	private String betweenHeartBeatsMaxDurationStr;
 	
 	
