@@ -29,14 +29,14 @@ public class HealthMonitorService {
 	@Autowired
 	private AppAliveEntryRepository appAliveEntryRepo;
 	
-	@Value("${max-duration-beetween-heartbeats-str}")
-	private String betweenHeartBeatsMaxDurationStr;
+	@Value("${max-minutes-beetween-heartbeats}")
+	private int betweenHeartBeatsMaxMinutes;
 	
 	
 	@PostConstruct
 	public void postConstruct() {
 		startTime = DateTime.now();
-		betweenHeartBeatsMaxDuration = Duration.parse(betweenHeartBeatsMaxDurationStr);
+		betweenHeartBeatsMaxDuration = Duration.standardMinutes(betweenHeartBeatsMaxMinutes);
 		LOG.info("HealthMonitorService created at {}. betweenHeartBeatsMaxDuration: {}", startTime, betweenHeartBeatsMaxDuration);
 	}
 	
