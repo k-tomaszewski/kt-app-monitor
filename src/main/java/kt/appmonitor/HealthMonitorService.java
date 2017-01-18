@@ -8,9 +8,12 @@ import kt.appmonitor.data.AppAliveEntry;
 import kt.appmonitor.dto.AppHeartBeatDto;
 import kt.appmonitor.persistence.AppAliveEntryRepository;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.ReadableDuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,15 +24,20 @@ public class HealthMonitorService {
 	private static final Logger LOG = LoggerFactory.getLogger(HealthMonitorService.class);
 	
 	private DateTime startTime;
+	private ReadableDuration betweenHeartBeatsMaxDuration;
 	
 	@Autowired
 	private AppAliveEntryRepository appAliveEntryRepo;
+	
+	@Value("max-duration-beetween-heartbeats-str")
+	private String betweenHeartBeatsMaxDurationStr;
 	
 	
 	@PostConstruct
 	public void postConstruct() {
 		startTime = DateTime.now();
-		System.out.println("HealthMonitorService created at " + startTime);
+		betweenHeartBeatsMaxDuration = Duration.parse(betweenHeartBeatsMaxDurationStr);
+		LOG.info("HealthMonitorService created at {}. betweenHeartBeatsMaxDuration: {}", startTime, betweenHeartBeatsMaxDuration);
 	}
 	
 	@Transactional
@@ -37,13 +45,19 @@ public class HealthMonitorService {
 		LOG.info("updateAppAliveEntry => appName: {}, heartBeatDto: {}", appName, heartBeatDto);
 		
 		AppAliveEntry existingEntry = appAliveEntryRepo.findLastAppAliveEntry(appName);
-		if (existingEntry == null) {	// OR it is too old
+		if (existingEntry == null || isLastAppAliveEntryTooOld(existingEntry, heartBeatDto.getTimestamp())) {
 			appAliveEntryRepo.create(new AppAliveEntry(appName, heartBeatDto.getTimestamp(), heartBeatDto.getTimestamp(), DateTime.now()));
 		} else {
 			existingEntry.setAliveToTime(heartBeatDto.getTimestamp());
 			existingEntry.setLastModifiedTime(DateTime.now());
 			appAliveEntryRepo.update(existingEntry);
 		}
+		
+		// TODO record additional data
+	}
+	
+	boolean isLastAppAliveEntryTooOld(AppAliveEntry entry, DateTime newHeartBeatTime) {
+		return (new Duration(entry.getAliveToTime(), newHeartBeatTime)).isLongerThan(betweenHeartBeatsMaxDuration);
 	}
 	
 	@Transactional(readOnly = true)
