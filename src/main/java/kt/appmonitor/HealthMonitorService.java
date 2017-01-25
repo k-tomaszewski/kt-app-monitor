@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,9 @@ public class HealthMonitorService {
 	@Value("${max-minutes-beetween-heartbeats}")
 	private int betweenHeartBeatsMaxMinutes;
 	
+	@Autowired
+	private Environment env;
+	
 	
 	@PostConstruct
 	public void postConstruct() {
@@ -44,13 +48,17 @@ public class HealthMonitorService {
 	public void updateAppAliveEntry(String appName, AppHeartBeatDto heartBeatDto) {
 		LOG.info("updateAppAliveEntry => appName: {}, heartBeatDto: {}", appName, heartBeatDto);
 		
-		AppAliveEntry existingEntry = appAliveEntryRepo.findLastAppAliveEntry(appName);
-		if (existingEntry == null || isLastAppAliveEntryTooOld(existingEntry, heartBeatDto.getTimestamp())) {
+		AppAliveEntry lastEntry = appAliveEntryRepo.findLastAppAliveEntry(appName);
+		if (lastEntry != null) {
+			// TODO check if lastEntry data and heartBeatDto are not inconsistent
+		}
+		
+		if (lastEntry == null || isLastAppAliveEntryTooOld(lastEntry, heartBeatDto.getTimestamp())) {
 			appAliveEntryRepo.create(new AppAliveEntry(appName, heartBeatDto.getTimestamp(), heartBeatDto.getTimestamp(), DateTime.now()));
 		} else {
-			existingEntry.setAliveToTime(heartBeatDto.getTimestamp());
-			existingEntry.setLastModifiedTime(DateTime.now());
-			appAliveEntryRepo.update(existingEntry);
+			lastEntry.setAliveToTime(heartBeatDto.getTimestamp());
+			lastEntry.setLastModifiedTime(DateTime.now());
+			appAliveEntryRepo.update(lastEntry);
 		}
 		
 		// TODO record additional data
@@ -79,6 +87,7 @@ public class HealthMonitorService {
 		statusVariables.put("runtime CPU count", Runtime.getRuntime().availableProcessors());
 		statusVariables.put("runtime free memory", Runtime.getRuntime().freeMemory());
 		statusVariables.put("runtime total memory", Runtime.getRuntime().totalMemory());
+		statusVariables.put("active profiles", env.getActiveProfiles());
 		
 		return statusVariables;
 	}

@@ -1,13 +1,19 @@
 package kt.appmonitor.data;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import javax.validation.constraints.NotNull;
 import org.joda.time.DateTime;
 
 
+@JsonInclude(Include.NON_NULL)
 public class AppAliveEntry {
 	
 	private Integer id;
 	private String appName;
-	private DateTime aliveFromTime;
+	@NotNull
+	private final DateTime aliveFromTime;
+	@NotNull
 	private DateTime aliveToTime;
 	private DateTime lastModifiedTime;
 

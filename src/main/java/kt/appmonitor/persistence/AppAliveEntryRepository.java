@@ -1,7 +1,10 @@
 package kt.appmonitor.persistence;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.List;
 import kt.appmonitor.data.AppAliveEntry;
 import org.joda.time.DateTime;
@@ -9,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 
@@ -34,13 +39,24 @@ public class AppAliveEntryRepository {
 	}
 	
 	public AppAliveEntry create(AppAliveEntry appAlive) {
-		Integer id = jdbcTemplate.queryForObject(
-				"insert into app_alive (APP_NAME, START_DATETIME, END_DATETIME, LAST_MOD_DATETIME) values (?,?,?,?) RETURNING id",
-				Integer.class,
-				appAlive.getAppName(), appAlive.getAliveFromTime().toDate(), appAlive.getAliveToTime().toDate(),
-				appAlive.getLastModifiedTime().toDate());
-		appAlive.setId(id);
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		jdbcTemplate.update((connection) -> {
+			PreparedStatement prepStmt = connection.prepareStatement(
+					"insert into app_alive (APP_NAME, START_DATETIME, END_DATETIME, LAST_MOD_DATETIME) values (?,?,?,?)",
+					Statement.RETURN_GENERATED_KEYS);
+			prepStmt.setString(1, appAlive.getAppName());
+			prepStmt.setTimestamp(2, asTimestamp(appAlive.getAliveFromTime()));
+			prepStmt.setTimestamp(3, asTimestamp(appAlive.getAliveToTime()));
+			prepStmt.setTimestamp(4, asTimestamp(appAlive.getLastModifiedTime()));
+			return prepStmt;
+		}, keyHolder);
+		
+		appAlive.setId(keyHolder.getKey().intValue());
 		return appAlive;
+	}
+	
+	private static Timestamp asTimestamp(DateTime dt) {
+		return new Timestamp(dt.getMillis());
 	}
 	
 	public void update(AppAliveEntry appAlive) {

@@ -6,28 +6,39 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
                 http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
- 
-    <context:component-scan base-package="kt.appmonitor"/>
+     
+    <beans profile="prod">
+        <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+            <property name="driverClassName" value="org.postgresql.Driver"/>
+            <property name="url" value="#{ 'jdbc:postgresql://' + @dbUrl.getHost() + ':' + @dbUrl.getPort() + @dbUrl.getPath() }"/>
+            <property name="username" value="#{ @dbUrl.getUserInfo().split(':')[0] }"/>
+            <property name="password" value="#{ @dbUrl.getUserInfo().split(':')[1] }"/>
+        </bean>
+        <bean class="java.net.URI" id="dbUrl">
+            <constructor-arg value="#{systemEnvironment['DATABASE_URL']}"/>
+        </bean>        
+    </beans>
     
-    <context:property-placeholder location="classpath:config.properties" />
+    <beans profile="dev">
+        <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+            <property name="driverClassName" value="org.h2.Driver"/>
+            <property name="url" value="jdbc:h2:mem:devdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;TRACE_LEVEL_SYSTEM_OUT=2"/>
+            <property name="username" value="sa"/>
+            <property name="password" value=""/>
+        </bean>
+    </beans>
     
-    <bean class="java.net.URI" id="dbUrl">
-        <constructor-arg value="#{systemEnvironment['DATABASE_URL']}"/>
-    </bean>
-
-    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
-        <property name="url" value="#{ 'jdbc:postgresql://' + @dbUrl.getHost() + ':' + @dbUrl.getPort() + @dbUrl.getPath() }"/>
-        <property name="username" value="#{ @dbUrl.getUserInfo().split(':')[0] }"/>
-        <property name="password" value="#{ @dbUrl.getUserInfo().split(':')[1] }"/>
-        <property name="driverClassName" value="org.postgresql.Driver"/>
-    </bean>
+    <beans profile="prod,dev">
+        <context:component-scan base-package="kt.appmonitor"/>
     
-    <jdbc:initialize-database data-source="dataSource" enabled="true">
-        <jdbc:script location="classpath:db-schema-pgsql.sql"/>
-    </jdbc:initialize-database>
+        <context:property-placeholder location="classpath:config.properties" />        
+        
+        <jdbc:initialize-database data-source="dataSource" enabled="true">
+            <jdbc:script location="classpath:db-schema-pgsql.sql"/>
+        </jdbc:initialize-database>
     
-    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
- 
+        <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+            <property name="dataSource" ref="dataSource"/>
+        </bean>
+    </beans>
 </beans>
