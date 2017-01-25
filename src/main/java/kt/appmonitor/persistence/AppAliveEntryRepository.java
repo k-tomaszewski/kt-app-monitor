@@ -1,9 +1,7 @@
 package kt.appmonitor.persistence;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.List;
 import kt.appmonitor.data.AppAliveEntry;
@@ -12,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 
@@ -38,25 +34,10 @@ public class AppAliveEntryRepository {
 				new Object[]{appName}, appAliveEntryRowMapper);		
 	}
 	
-	public AppAliveEntry create(AppAliveEntry appAlive) {
-		KeyHolder keyHolder = new GeneratedKeyHolder();
-		jdbcTemplate.update((connection) -> {
-			PreparedStatement prepStmt = connection.prepareStatement(
-					"insert into app_alive (APP_NAME, START_DATETIME, END_DATETIME, LAST_MOD_DATETIME) values (?,?,?,?)",
-					Statement.RETURN_GENERATED_KEYS);
-			prepStmt.setString(1, appAlive.getAppName());
-			prepStmt.setTimestamp(2, asTimestamp(appAlive.getAliveFromTime()));
-			prepStmt.setTimestamp(3, asTimestamp(appAlive.getAliveToTime()));
-			prepStmt.setTimestamp(4, asTimestamp(appAlive.getLastModifiedTime()));
-			return prepStmt;
-		}, keyHolder);
-		
-		appAlive.setId(keyHolder.getKey().intValue());
-		return appAlive;
-	}
-	
-	private static Timestamp asTimestamp(DateTime dt) {
-		return new Timestamp(dt.getMillis());
+	public void create(AppAliveEntry appAlive) {
+		jdbcTemplate.update("insert into app_alive (APP_NAME, START_DATETIME, END_DATETIME, LAST_MOD_DATETIME) values (?,?,?,?)",
+				appAlive.getAppName(), asTimestamp(appAlive.getAliveFromTime()), asTimestamp(appAlive.getAliveToTime()), 
+				asTimestamp(appAlive.getLastModifiedTime()));	
 	}
 	
 	public void update(AppAliveEntry appAlive) {
@@ -70,4 +51,8 @@ public class AppAliveEntryRepository {
 		DateTime lastUpdateTime = new DateTime(rs.getDate("LAST_MOD_DATETIME"));
 		return new AppAliveEntry(rs.getInt("ID"), fromTime, endTime, lastUpdateTime);		
 	}
+	
+	private static Timestamp asTimestamp(DateTime dt) {
+		return new Timestamp(dt.getMillis());
+	}	
 }
