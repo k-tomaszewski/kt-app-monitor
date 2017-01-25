@@ -37,7 +37,8 @@ public class AppAliveEntryRepository {
 		Integer id = jdbcTemplate.queryForObject(
 				"insert into app_alive (APP_NAME, START_DATETIME, END_DATETIME, LAST_MOD_DATETIME) values (?,?,?,?) RETURNING id",
 				Integer.class,
-				appAlive.getAppName(), appAlive.getAliveFromTime(), appAlive.getAliveToTime(), appAlive.getLastModifiedTime());
+				appAlive.getAppName(), appAlive.getAliveFromTime().toDate(), appAlive.getAliveToTime().toDate(),
+				appAlive.getLastModifiedTime().toDate());
 		appAlive.setId(id);
 		return appAlive;
 	}
