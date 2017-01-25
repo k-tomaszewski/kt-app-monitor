@@ -15,7 +15,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class AppAliveEntryRepository {
 	
-	private static final ResultSetExtractor<AppAliveEntry> appAliveExtractor = (ResultSet rs) -> mapCurrentToAppAliveEntry(rs);
+	private static final ResultSetExtractor<AppAliveEntry> appAliveExtractor =
+			(ResultSet rs) -> (rs.next() ? mapCurrentToAppAliveEntry(rs) : null);
 	private static final RowMapper<AppAliveEntry> appAliveEntryRowMapper = (ResultSet rs, int i) -> mapCurrentToAppAliveEntry(rs);	
 	
 	@Autowired
