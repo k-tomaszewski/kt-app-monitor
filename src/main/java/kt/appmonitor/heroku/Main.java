@@ -1,5 +1,7 @@
 package kt.appmonitor.heroku;
 
+import java.util.stream.Stream;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 
@@ -18,8 +20,11 @@ public class Main {
         }
 
         final Server server = new Server(Integer.valueOf(webPort));
+		Stream.of(server.getConnectors()).flatMap(connector -> connector.getConnectionFactories().stream())
+				.filter(connFactory -> connFactory instanceof HttpConnectionFactory)
+				.forEach(httpConnFactory -> ((HttpConnectionFactory)httpConnFactory).getHttpConfiguration().setSendServerVersion(false));
+		
         final WebAppContext root = new WebAppContext();
-
         root.setContextPath("/");
         // Parent loader priority is a class loader setting that Jetty accepts.
         // By default Jetty will behave like most web containers in that it will
