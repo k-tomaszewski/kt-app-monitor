@@ -1,4 +1,4 @@
-package kt.appmonitor.security;
+package kt.common.crypto;
 
 import java.io.IOException;
 import java.io.InputStream;
