@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import javax.xml.bind.DatatypeConverter;
 import kt.appmonitor.SignedData;
-import org.bouncycastle.util.encoders.Hex;
 import org.joda.time.DateTime;
 
 
@@ -97,11 +97,24 @@ public class AppHeartBeatDto implements SignedData {
 		}
 		txt.append(", signature: ");
 		if (signature != null) {
-			txt.append("0x").append(Hex.toHexString(signature));
+			txt.append("0x").append(DatatypeConverter.printHexBinary(signature));
 		} else {
 			txt.append("n/a");
 		}
 		txt.append("}");
 		return txt.toString();
+	}
+	
+	public static void main(String[] args) {
+		TreeMap<String, Object> metrics = new TreeMap<>();
+		metrics.put("temp", 16.3);
+		metrics.put("status", "ok");
+		
+		AppHeartBeatDto x = new AppHeartBeatDto();
+		x.setTimestamp(DateTime.now());
+		x.setSignature(new byte[]{1, 2, 3});
+		x.setMetrics(metrics);
+		
+		System.out.println(x);
 	}
 }
