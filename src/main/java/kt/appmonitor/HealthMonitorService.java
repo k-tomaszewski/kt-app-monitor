@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import kt.appmonitor.data.AppAliveEntry;
 import kt.appmonitor.dto.AppHeartBeatDto;
 import kt.appmonitor.persistence.AppAliveEntryRepository;
+import org.apache.commons.lang3.Validate;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.ReadableDuration;
@@ -36,6 +37,9 @@ public class HealthMonitorService {
 	@Autowired
 	private Environment env;
 	
+	@Autowired
+	private SignatureVerifier signatureVerifier;
+	
 	
 	@PostConstruct
 	public void postConstruct() {
@@ -48,9 +52,15 @@ public class HealthMonitorService {
 	public void updateAppAliveEntry(String appName, AppHeartBeatDto heartBeatDto) {
 		LOG.info("updateAppAliveEntry => appName: {}, heartBeatDto: {}", appName, heartBeatDto);
 		
-		AppAliveEntry lastEntry = appAliveEntryRepo.findLastAppAliveEntry(appName);
+		// check input data signature
+		Validate.isTrue(signatureVerifier.hasValidSignature(heartBeatDto),
+				"Input data has invalid signature");
+		
+		final AppAliveEntry lastEntry = appAliveEntryRepo.findLastAppAliveEntry(appName);
 		if (lastEntry != null) {
-			// TODO check if lastEntry data and heartBeatDto are not inconsistent
+			Validate.isTrue(heartBeatDto.getTimestamp().isAfter(lastEntry.getAliveToTime()),
+					"Input data timestamp (%s) not after last entry timestamp (%s)",
+					heartBeatDto.getTimestamp(), lastEntry.getAliveToTime());
 		}
 		
 		if (lastEntry == null || isLastAppAliveEntryTooOld(lastEntry, heartBeatDto.getTimestamp())) {
