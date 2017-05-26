@@ -1,5 +1,6 @@
 package kt.appmonitor.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import javax.xml.bind.DatatypeConverter;
 import kt.appmonitor.SignedData;
+import kt.common.jackson.ByteArrayBase64Deserializer;
 import org.joda.time.DateTime;
 
 
@@ -15,6 +17,8 @@ public class AppHeartBeatDto implements SignedData {
 
 	private DateTime timestamp;
 	private SortedMap<String, Object> metrics;
+	
+	@JsonDeserialize(using = ByteArrayBase64Deserializer.class)
 	private byte[] signature;
 
 	

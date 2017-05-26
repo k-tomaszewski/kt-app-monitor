@@ -52,22 +52,24 @@ public class HealthMonitorService {
 	public void updateAppAliveEntry(String appName, AppHeartBeatDto heartBeatDto) {
 		LOG.info("updateAppAliveEntry => appName: {}, heartBeatDto: {}", appName, heartBeatDto);
 		
-		// check input data signature
-		Validate.isTrue(signatureVerifier.hasValidSignature(heartBeatDto),
-				"Input data has invalid signature");
-		
 		final AppAliveEntry lastEntry = appAliveEntryRepo.findLastAppAliveEntry(appName);
 		if (lastEntry != null) {
-			Validate.isTrue(heartBeatDto.getTimestamp().isAfter(lastEntry.getAliveToTime()),
+			Validate.isTrue(heartBeatDto.getTimestamp().isAfter(lastEntry.getLastHeartBeatTime()),
 					"Input data timestamp (%s) not after last entry timestamp (%s)",
 					heartBeatDto.getTimestamp(), lastEntry.getAliveToTime());
 		}
 		
+		// check input data signature
+		Validate.isTrue(signatureVerifier.hasValidSignature(heartBeatDto),
+				"Input data has invalid signature");
+		
+		final DateTime now = DateTime.now();
 		if (lastEntry == null || isLastAppAliveEntryTooOld(lastEntry, heartBeatDto.getTimestamp())) {
-			appAliveEntryRepo.create(new AppAliveEntry(appName, heartBeatDto.getTimestamp(), heartBeatDto.getTimestamp(), DateTime.now()));
+			appAliveEntryRepo.create(new AppAliveEntry(appName, now, now, heartBeatDto.getTimestamp()));
 		} else {
-			lastEntry.setAliveToTime(heartBeatDto.getTimestamp());
-			lastEntry.setLastModifiedTime(DateTime.now());
+			lastEntry.setAliveToTime(now);
+			lastEntry.setLastHeartBeatTime(heartBeatDto.getTimestamp());
+			lastEntry.incrementHeartBeatCount();
 			appAliveEntryRepo.update(lastEntry);
 		}
 		
@@ -93,7 +95,7 @@ public class HealthMonitorService {
 			}
 		});
 		statusVariables.put("DYNO", System.getenv("DYNO"));
-		statusVariables.put("app start timestamp", (startTime != null) ? startTime.toString() : null);
+		statusVariables.put("app start timestamp", startTime);
 		statusVariables.put("runtime CPU count", Runtime.getRuntime().availableProcessors());
 		statusVariables.put("runtime free memory", Runtime.getRuntime().freeMemory());
 		statusVariables.put("runtime total memory", Runtime.getRuntime().totalMemory());

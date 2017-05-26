@@ -11,25 +11,42 @@ public class AppAliveEntry {
 	
 	private Integer id;
 	private String appName;
+	
+	/**
+	 * Server timestamp of first report accounted for this AppAliveEntry
+	 */
 	@NotNull
 	private final DateTime aliveFromTime;
+	
+	/**
+	 * Server timestamp of last report account for this AppAliveEntry
+	 */
 	@NotNull
 	private DateTime aliveToTime;
-	private DateTime lastModifiedTime;
+	
+	/**
+	 * Timestamp from last heart beat accounted for this AppAliveEntry
+	 */
+	private DateTime lastHeartBeatTime;
+	
+	private int heartBeatCount;
 
 	
-	public AppAliveEntry(Integer id, DateTime aliveFromTime, DateTime aliveToTime, DateTime lastModifiedTime) {
+	public AppAliveEntry(Integer id, DateTime aliveFromTime, DateTime aliveToTime, DateTime lastHeartBeatTime,
+			int heartBeatCount) {
 		this.id = id;
 		this.aliveFromTime = aliveFromTime;
 		this.aliveToTime = aliveToTime;
-		this.lastModifiedTime = lastModifiedTime;
+		this.lastHeartBeatTime = lastHeartBeatTime;
+		this.heartBeatCount = heartBeatCount;
 	}
 	
-	public AppAliveEntry(String appName, DateTime aliveFromTime, DateTime aliveToTime, DateTime lastModifiedTime) {
+	public AppAliveEntry(String appName, DateTime aliveFromTime, DateTime aliveToTime, DateTime lastHeartBeatTime) {
 		this.appName = appName;
 		this.aliveFromTime = aliveFromTime;
 		this.aliveToTime = aliveToTime;
-		this.lastModifiedTime = lastModifiedTime;
+		this.lastHeartBeatTime = lastHeartBeatTime;
+		heartBeatCount = 1;
 	}	
 
 	public Integer getId() {
@@ -52,15 +69,23 @@ public class AppAliveEntry {
 		return aliveToTime;
 	}
 
-	public DateTime getLastModifiedTime() {
-		return lastModifiedTime;
+	public DateTime getLastHeartBeatTime() {
+		return lastHeartBeatTime;
 	}
 
 	public void setAliveToTime(DateTime aliveToTime) {
 		this.aliveToTime = aliveToTime;
 	}
 
-	public void setLastModifiedTime(DateTime lastModifiedTime) {
-		this.lastModifiedTime = lastModifiedTime;
+	public void setLastHeartBeatTime(DateTime lastHeartBeatTime) {
+		this.lastHeartBeatTime = lastHeartBeatTime;
+	}
+
+	public int getHeartBeatCount() {
+		return heartBeatCount;
+	}
+	
+	public void incrementHeartBeatCount() {
+		++heartBeatCount;
 	}
 }
