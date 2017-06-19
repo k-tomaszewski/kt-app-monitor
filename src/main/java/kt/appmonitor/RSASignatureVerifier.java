@@ -12,9 +12,11 @@ import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.signers.RSADigestSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 
+@Profile("prod")
 @Component
 public class RSASignatureVerifier implements SignatureVerifier {
 	

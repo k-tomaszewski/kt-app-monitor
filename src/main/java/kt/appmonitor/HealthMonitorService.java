@@ -1,12 +1,16 @@
 package kt.appmonitor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.annotation.PostConstruct;
 import kt.appmonitor.data.AppAliveEntry;
+import kt.appmonitor.data.AppMetrics;
 import kt.appmonitor.dto.AppHeartBeatDto;
 import kt.appmonitor.persistence.AppAliveEntryRepository;
+import kt.appmonitor.persistence.AppMetricsRepository;
 import org.apache.commons.lang3.Validate;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -31,6 +35,9 @@ public class HealthMonitorService {
 	@Autowired
 	private AppAliveEntryRepository appAliveEntryRepo;
 	
+	@Autowired
+	private AppMetricsRepository appMetricsRepo;
+	
 	@Value("${max-minutes-beetween-heartbeats}")
 	private int betweenHeartBeatsMaxMinutes;
 	
@@ -39,6 +46,8 @@ public class HealthMonitorService {
 	
 	@Autowired
 	private SignatureVerifier signatureVerifier;
+	
+	private final ObjectMapper mapper = new ObjectMapper();
 	
 	
 	@PostConstruct
@@ -64,16 +73,35 @@ public class HealthMonitorService {
 				"Input data has invalid signature");
 		
 		final DateTime now = DateTime.now();
+		AppAliveEntry currentEntry;
+		
 		if (lastEntry == null || isLastAppAliveEntryTooOld(lastEntry, heartBeatDto.getTimestamp())) {
-			appAliveEntryRepo.create(new AppAliveEntry(appName, now, now, heartBeatDto.getTimestamp()));
+			currentEntry = appAliveEntryRepo.create(new AppAliveEntry(appName, now, now, heartBeatDto.getTimestamp()));
 		} else {
 			lastEntry.setAliveToTime(now);
 			lastEntry.setLastHeartBeatTime(heartBeatDto.getTimestamp());
 			lastEntry.incrementHeartBeatCount();
 			appAliveEntryRepo.update(lastEntry);
+			currentEntry = lastEntry;
 		}
 		
-		// TODO record additional data
+		// record additional data
+		String metricsJson = generateJson(heartBeatDto.getMetrics());
+		if (metricsJson != null) {
+			appMetricsRepo.create(new AppMetrics(currentEntry, metricsJson, now));
+		}
+	}
+	
+	String generateJson(Object obj) {
+		if (obj == null) {
+			return null;
+		}
+		try {
+			return mapper.writeValueAsString(obj);
+		} catch (JsonProcessingException ex) {
+			LOG.error("Cannot generate JSON representation of heartbeat metrics data.", ex);
+			return null;
+		}
 	}
 	
 	boolean isLastAppAliveEntryTooOld(AppAliveEntry entry, DateTime newHeartBeatTime) {

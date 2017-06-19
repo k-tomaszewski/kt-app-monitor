@@ -1,5 +1,7 @@
 package kt.appmonitor.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -13,6 +15,7 @@ import kt.common.jackson.ByteArrayBase64Deserializer;
 import org.joda.time.DateTime;
 
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AppHeartBeatDto implements SignedData {
 
 	private DateTime timestamp;
@@ -41,6 +44,7 @@ public class AppHeartBeatDto implements SignedData {
 	/**
 	 * Wszystkie dane oprocz pola {@link #signature}
 	 */
+	@JsonIgnore
 	@Override
 	public byte[] getDataBytes() {
 		try {

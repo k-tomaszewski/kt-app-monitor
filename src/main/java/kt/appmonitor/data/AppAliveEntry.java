@@ -2,33 +2,54 @@ package kt.appmonitor.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 
+@Entity
+@Table(name = "app_alive")
 @JsonInclude(Include.NON_NULL)
 public class AppAliveEntry {
 	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "ID")
 	private Integer id;
+	
+	@Column(name = "APP_NAME", nullable = false, updatable = false)
 	private String appName;
 	
 	/**
 	 * Server timestamp of first report accounted for this AppAliveEntry
 	 */
+	@Column(name = "START_DATETIME", nullable = false, updatable = false)
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	@NotNull
-	private final DateTime aliveFromTime;
+	private DateTime aliveFromTime;
 	
 	/**
 	 * Server timestamp of last report account for this AppAliveEntry
 	 */
+	@Column(name = "END_DATETIME", nullable = false)
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	@NotNull
 	private DateTime aliveToTime;
 	
 	/**
 	 * Timestamp from last heart beat accounted for this AppAliveEntry
 	 */
+	@Column(name = "LAST_HEARTBEAT_DATETIME", nullable = false)
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime lastHeartBeatTime;
 	
+	@Column(name = "HEARTBEAT_COUNT", nullable = false)
 	private int heartBeatCount;
 
 	
@@ -47,7 +68,11 @@ public class AppAliveEntry {
 		this.aliveToTime = aliveToTime;
 		this.lastHeartBeatTime = lastHeartBeatTime;
 		heartBeatCount = 1;
-	}	
+	}
+	
+	// for Hibernate
+	public AppAliveEntry() {
+	}
 
 	public Integer getId() {
 		return id;

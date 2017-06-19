@@ -1,72 +1,57 @@
 package kt.appmonitor.persistence;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 import kt.appmonitor.data.AppAliveEntry;
-import org.joda.time.DateTime;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Repository
+@Transactional
 public class AppAliveEntryRepository {
 	
-	private static final ResultSetExtractor<AppAliveEntry> appAliveExtractor =
-			(ResultSet rs) -> (rs.next() ? mapCurrentToAppAliveEntry(rs) : null);
-	private static final RowMapper<AppAliveEntry> appAliveEntryRowMapper = (ResultSet rs, int i) -> mapCurrentToAppAliveEntry(rs);	
-	
+	private static final Class<AppAliveEntry> ENTITY_CLASS = AppAliveEntry.class;
+
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private SessionFactory sessionFactory;
 	
 	
 	public AppAliveEntry findLastAppAliveEntry(String appName) {
-		return jdbcTemplate.query(
-			"select * from app_alive where APP_NAME = ? order by END_DATETIME desc limit 1",
-			new Object[]{appName},
-			appAliveExtractor);
+		return getSession()
+			.createQuery("select x from " + ENTITY_CLASS.getName() + " x where x.appName = :appName "
+				+ "order by x.aliveToTime DESC", ENTITY_CLASS)
+			.setMaxResults(1)
+			.setParameter("appName", appName)
+			.getResultList()
+			.stream().findAny().orElse(null);
 	}
 	
 	public List<AppAliveEntry> findAppAliveEntries(String appName) {
-		return jdbcTemplate.query(
-			"select ID, START_DATETIME, END_DATETIME, LAST_HEARTBEAT_DATETIME, HEARTBEAT_COUNT from app_alive where APP_NAME = ?",
-			new Object[]{appName},
-			appAliveEntryRowMapper);	
+		return getSession()
+			.createQuery("select x from " + ENTITY_CLASS.getName() + " x where x.appName = :appName", ENTITY_CLASS)
+			.setParameter("appName", appName)
+			.getResultList();
 	}
 	
-	public void create(AppAliveEntry appAlive) {
-		jdbcTemplate.update(
-			"insert into app_alive (APP_NAME, START_DATETIME, END_DATETIME, LAST_HEARTBEAT_DATETIME, HEARTBEAT_COUNT) values (?,?,?,?,?)",
-			appAlive.getAppName(),
-			asTimestamp(appAlive.getAliveFromTime()),
-			asTimestamp(appAlive.getAliveToTime()),
-			asTimestamp(appAlive.getLastHeartBeatTime()),
-			appAlive.getHeartBeatCount());
+	public AppAliveEntry create(AppAliveEntry appAlive) {
+		getSession().save(appAlive);
+		return appAlive;
 	}
 	
 	public void update(AppAliveEntry appAlive) {
-		jdbcTemplate.update(
-			"update app_alive set END_DATETIME = ?, LAST_HEARTBEAT_DATETIME = ?, HEARTBEAT_COUNT = ? where id = ?",
-			asTimestamp(appAlive.getAliveToTime()),
-			asTimestamp(appAlive.getLastHeartBeatTime()),
-			appAlive.getHeartBeatCount(),
-			appAlive.getId());
+		getSession().update(appAlive);
 	}
 	
-	private static AppAliveEntry mapCurrentToAppAliveEntry(ResultSet rs) throws SQLException {
-		return new AppAliveEntry(
-			rs.getInt("ID"),
-			new DateTime(rs.getTimestamp("START_DATETIME")),
-			new DateTime(rs.getTimestamp("END_DATETIME")),
-			new DateTime(rs.getTimestamp("LAST_HEARTBEAT_DATETIME")),
-			rs.getInt("HEARTBEAT_COUNT"));		
+	public long count() {
+		return getSession()
+			.createQuery("select count(x) from " + ENTITY_CLASS.getName() + " x", Long.class)
+			.getSingleResult();
 	}
 	
-	private static Timestamp asTimestamp(DateTime dt) {
-		return new Timestamp(dt.getMillis());
+	private Session getSession() {
+		return sessionFactory.getCurrentSession();
 	}	
 }
