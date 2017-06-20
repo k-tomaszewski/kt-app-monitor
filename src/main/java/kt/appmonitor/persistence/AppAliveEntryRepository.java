@@ -31,7 +31,8 @@ public class AppAliveEntryRepository {
 	
 	public List<AppAliveEntry> findAppAliveEntries(String appName) {
 		return getSession()
-			.createQuery("select x from " + ENTITY_CLASS.getName() + " x where x.appName = :appName", ENTITY_CLASS)
+			.createQuery("select x from " + ENTITY_CLASS.getName() + " x left join fetch x.metricsEntries where x.appName = :appName",
+				ENTITY_CLASS)
 			.setParameter("appName", appName)
 			.getResultList();
 	}

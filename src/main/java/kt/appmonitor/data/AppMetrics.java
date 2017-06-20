@@ -6,7 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Type;
@@ -22,7 +22,7 @@ public class AppMetrics {
 	@Column(name = "ID")
 	private Integer id;
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "APP_ALIVE_ID", nullable = false, updatable = false)
 	private AppAliveEntry appAliveEntry;
 	

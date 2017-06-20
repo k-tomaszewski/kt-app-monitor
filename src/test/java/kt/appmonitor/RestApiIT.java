@@ -28,16 +28,18 @@ import org.springframework.web.client.RestTemplate;
 public class RestApiIT {
 	static final Logger LOG = LoggerFactory.getLogger(RestApiIT.class);
 	static final String BASIC_URL = "http://localhost:8080/api/v1/";
+	static final String APP_NAME_PREFIX = "test-" + System.currentTimeMillis() + '-';
+	static int counter = 0;	
 	
 	final RestTemplate restTemplate = new RestTemplate();
 	final HttpHeaders headers = new HttpHeaders();
-	
+
 	
 	public RestApiIT() {
 		restTemplate.getMessageConverters().stream().filter(mc -> mc instanceof MappingJackson2HttpMessageConverter).findFirst()
 			.ifPresent((httpMsgConverter) -> {
 				MappingJackson2HttpMessageConverter jacksonMsgConverter = (MappingJackson2HttpMessageConverter) httpMsgConverter;
-				LOG.info("MappingJackson2HttpMessageConverter found in RestTemlate message converters. Registering {}...", DateTimeModule.class);
+				LOG.debug("MappingJackson2HttpMessageConverter found in RestTemlate message converters. Registering {}...", DateTimeModule.class);
 				jacksonMsgConverter.getObjectMapper().registerModule(new DateTimeModule());
 			});
 		restTemplate.setErrorHandler(new ResponseErrorHandler() {
@@ -57,8 +59,12 @@ public class RestApiIT {
 	
 	@Test
 	public void shouldHandleGetRequestForAnyAppName() {
+		// given
+		final String appName = APP_NAME_PREFIX + (++counter);
+		LOG.info("Using app-name: {}", appName);
+		
 		// when
-		AppAliveEntry[] appAliveEntries = restTemplate.getForObject(BASIC_URL + "test-app-name", AppAliveEntry[].class);
+		AppAliveEntry[] appAliveEntries = restTemplate.getForObject(BASIC_URL + appName, AppAliveEntry[].class);
 		
 		// then
 		Assert.assertNotNull(appAliveEntries);
@@ -71,7 +77,8 @@ public class RestApiIT {
 		AppHeartBeatDto heartBeat = new AppHeartBeatDto();
 		heartBeat.setTimestamp(DateTime.now());
 		
-		final String appName = "test-" + System.currentTimeMillis();
+		final String appName = APP_NAME_PREFIX + (++counter);
+		LOG.info("Using app-name: {}", appName);
 		
 		// when
 		RequestEntity<AppHeartBeatDto> request = new RequestEntity<>(heartBeat, headers, HttpMethod.PUT, new URI(BASIC_URL + appName));
@@ -81,6 +88,7 @@ public class RestApiIT {
 		// then
 		Assert.assertNotNull(appAliveEntries);
 		Assert.assertEquals(1, appAliveEntries.length);
+		Assert.assertTrue(appAliveEntries[0].getMetricsEntries().isEmpty());
 	}
 	
 	@Test
@@ -94,7 +102,8 @@ public class RestApiIT {
 		heartBeat.setTimestamp(DateTime.now());
 		heartBeat.setMetrics(metrics);
 		
-		final String appName = "test-" + System.currentTimeMillis();
+		final String appName = APP_NAME_PREFIX + (++counter);
+		LOG.info("Using app-name: {}", appName);
 		
 		// when
 		RequestEntity<AppHeartBeatDto> request = new RequestEntity<>(heartBeat, headers, HttpMethod.PUT, new URI(BASIC_URL + appName));
@@ -103,7 +112,8 @@ public class RestApiIT {
 		
 		// then
 		Assert.assertNotNull(appAliveEntries);
-		Assert.assertEquals(1, appAliveEntries.length);		
+		Assert.assertEquals(1, appAliveEntries.length);
+		Assert.assertEquals(1, appAliveEntries[0].getMetricsEntries().size());
 	}
 	
 	static String read(InputStream is) {
