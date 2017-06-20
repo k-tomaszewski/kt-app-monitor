@@ -112,6 +112,7 @@ public class RestApiIT {
 		// then
 		Assert.assertNotNull(appAliveEntries);
 		Assert.assertEquals(1, appAliveEntries.length);
+		Assert.assertEquals(1, appAliveEntries[0].getHeartBeatCount());
 		Assert.assertEquals(1, appAliveEntries[0].getMetricsEntries().size());
 	}
 	
@@ -150,6 +151,7 @@ public class RestApiIT {
 		// then
 		Assert.assertNotNull(appAliveEntries);
 		Assert.assertEquals(1, appAliveEntries.length);
+		Assert.assertEquals(2, appAliveEntries[0].getHeartBeatCount());
 		Assert.assertEquals(2, appAliveEntries[0].getMetricsEntries().size());		
 	}
 	
