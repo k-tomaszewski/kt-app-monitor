@@ -81,8 +81,7 @@ public class RestApiIT {
 		LOG.info("Using app-name: {}", appName);
 		
 		// when
-		RequestEntity<AppHeartBeatDto> request = new RequestEntity<>(heartBeat, headers, HttpMethod.PUT, new URI(BASIC_URL + appName));
-		restTemplate.exchange(request, Void.class);
+		restTemplate.exchange(new RequestEntity<>(heartBeat, headers, HttpMethod.PUT, new URI(BASIC_URL + appName)), Void.class);
 		AppAliveEntry[] appAliveEntries = restTemplate.getForObject(BASIC_URL + appName, AppAliveEntry[].class);
 		
 		// then
@@ -114,6 +113,44 @@ public class RestApiIT {
 		Assert.assertNotNull(appAliveEntries);
 		Assert.assertEquals(1, appAliveEntries.length);
 		Assert.assertEquals(1, appAliveEntries[0].getMetricsEntries().size());
+	}
+	
+	@Test
+	public void shouldMergeSubsequentHeartbeats() throws URISyntaxException, InterruptedException {
+		// given
+		TreeMap<String, Object> metrics1 = new TreeMap<>();
+		metrics1.put("temperatura", 45.52);
+		metrics1.put("load avg", new float[]{0.3f, 0.2f, 0.07f});
+		
+		AppHeartBeatDto heartBeat1 = new AppHeartBeatDto();
+		heartBeat1.setTimestamp(DateTime.now());
+		heartBeat1.setMetrics(metrics1);
+
+		TreeMap<String, Object> metrics2 = new TreeMap<>();
+		metrics2.put("temperatura", 41.1);
+		metrics2.put("load avg", new float[]{0.1f, 0.1f, 0.05f});
+		
+		AppHeartBeatDto heartBeat2 = new AppHeartBeatDto();
+		heartBeat2.setTimestamp(DateTime.now().plusSeconds(1));
+		heartBeat2.setMetrics(metrics2);
+
+		final String appName = APP_NAME_PREFIX + (++counter);
+		LOG.info("Using app-name: {}", appName);
+
+		// when
+		LOG.info("Sending 1st request...");
+		restTemplate.exchange(new RequestEntity<>(heartBeat1, headers, HttpMethod.PUT, new URI(BASIC_URL + appName)), Void.class);
+		LOG.info("Waiting for 1 second...");
+		Thread.currentThread().sleep(1000);
+		LOG.info("Sending 2nd request...");
+		restTemplate.exchange(new RequestEntity<>(heartBeat2, headers, HttpMethod.PUT, new URI(BASIC_URL + appName)), Void.class);
+		LOG.info("Getting app-alive entries...");				
+		AppAliveEntry[] appAliveEntries = restTemplate.getForObject(BASIC_URL + appName, AppAliveEntry[].class);		
+		
+		// then
+		Assert.assertNotNull(appAliveEntries);
+		Assert.assertEquals(1, appAliveEntries.length);
+		Assert.assertEquals(2, appAliveEntries[0].getMetricsEntries().size());		
 	}
 	
 	static String read(InputStream is) {

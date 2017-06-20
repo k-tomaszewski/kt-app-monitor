@@ -4,6 +4,7 @@ import java.util.List;
 import kt.appmonitor.data.AppAliveEntry;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.jpa.QueryHints;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +32,10 @@ public class AppAliveEntryRepository {
 	
 	public List<AppAliveEntry> findAppAliveEntries(String appName) {
 		return getSession()
-			.createQuery("select x from " + ENTITY_CLASS.getName() + " x left join fetch x.metricsEntries where x.appName = :appName",
+			.createQuery("select distinct x from " + ENTITY_CLASS.getName() + " x left outer join fetch x.metricsEntries where x.appName = :appName",
 				ENTITY_CLASS)
 			.setParameter("appName", appName)
+			.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
 			.getResultList();
 	}
 	
