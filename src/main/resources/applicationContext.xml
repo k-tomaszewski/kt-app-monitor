@@ -4,10 +4,12 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:jdbc="http://www.springframework.org/schema/jdbc"
 	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
                 http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
-				http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+				http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+				http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
      
     <beans profile="prod">
         <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
@@ -44,12 +46,20 @@
 		<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
 			<property name="dataSource" ref="dataSource"/>
 			<property name="packagesToScan" value="kt.appmonitor.data"/>
+			<property name="hibernateProperties">
+				<props>
+					<prop key="jadira.usertype.autoRegisterUserTypes">true</prop>
+				</props>
+			</property>
 		</bean>		
     
 		<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
 			<property name="sessionFactory" ref="sessionFactory" />
 		</bean>
 		
-		<bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>		
+		<bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+		
+		<task:executor id="myExecutor" pool-size="1"/>
+		<task:annotation-driven executor="myExecutor"/>
     </beans>
 </beans>

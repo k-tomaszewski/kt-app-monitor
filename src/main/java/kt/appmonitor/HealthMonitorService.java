@@ -47,6 +47,9 @@ public class HealthMonitorService {
 	@Autowired
 	private SignatureVerifier signatureVerifier;
 	
+	@Autowired
+	private DbPrunningStrategy dbPrunningStrategy;
+	
 	private final ObjectMapper mapper = new ObjectMapper();
 	
 	
@@ -90,6 +93,8 @@ public class HealthMonitorService {
 		if (metricsJson != null) {
 			appMetricsRepo.create(new AppMetrics(currentEntry, metricsJson, now));
 		}
+		
+		dbPrunningStrategy.run();	// this should run async
 	}
 	
 	String generateJson(Object obj) {
@@ -128,6 +133,8 @@ public class HealthMonitorService {
 		statusVariables.put("runtime free memory", Runtime.getRuntime().freeMemory());
 		statusVariables.put("runtime total memory", Runtime.getRuntime().totalMemory());
 		statusVariables.put("active profiles", env.getActiveProfiles());
+		statusVariables.put("alive entries", appAliveEntryRepo.count());
+		statusVariables.put("metrics entries", appMetricsRepo.count());
 		
 		return statusVariables;
 	}

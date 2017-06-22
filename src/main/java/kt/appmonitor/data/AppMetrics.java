@@ -9,7 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 
@@ -31,7 +30,6 @@ public class AppMetrics {
 	private String content;
 	
 	@Column(name = "DATETIME", nullable = false, updatable = false)
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	@NotNull
 	private DateTime dataTime;
 

@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 
@@ -34,7 +33,6 @@ public class AppAliveEntry {
 	 * Server timestamp of first report accounted for this AppAliveEntry
 	 */
 	@Column(name = "START_DATETIME", nullable = false, updatable = false)
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	@NotNull
 	private DateTime aliveFromTime;
 	
@@ -42,7 +40,6 @@ public class AppAliveEntry {
 	 * Server timestamp of last report account for this AppAliveEntry
 	 */
 	@Column(name = "END_DATETIME", nullable = false)
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	@NotNull
 	private DateTime aliveToTime;
 	
@@ -50,7 +47,6 @@ public class AppAliveEntry {
 	 * Timestamp from last heart beat accounted for this AppAliveEntry
 	 */
 	@Column(name = "LAST_HEARTBEAT_DATETIME", nullable = false)
-	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime lastHeartBeatTime;
 	
 	@Column(name = "HEARTBEAT_COUNT", nullable = false)
