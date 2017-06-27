@@ -1,8 +1,11 @@
 package kt.appmonitor;
 
+import kt.appmonitor.persistence.AppAliveEntryRepository;
+import kt.appmonitor.persistence.AppMetricsRepository;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +17,13 @@ public class DbPrunningStrategy {
 	
 	private DateTime lastPrunningTime;
 	
+	@Autowired
+	private AppMetricsRepository appMetricsRepo;
+	
+	@Autowired
+	private AppAliveEntryRepository appAliveEntryRepo;
+	
+	
 	@Async
 	public void run() {
 		final DateTime now = DateTime.now();
@@ -21,12 +31,17 @@ public class DbPrunningStrategy {
 			LOG.info("DB prunning was executed at {} so it's not needed now.", lastPrunningTime);
 			return;
 		}
-		LOG.info("Starting DB prunning... (TODO)");
+		LOG.info("Starting DB prunning...");
 		
-		DateTime thresholdTime = now.minusMonths(2);
+		final DateTime thresholdTime = now.minusMonths(2);
 		
-		// TODO
+		final int removedAppMetricsRecords = appMetricsRepo.deleteOlderThan(thresholdTime);
+		LOG.info("Removed records with app metrics: {}", removedAppMetricsRecords);
 		
+		final int removedAppAliveRecords = appAliveEntryRepo.deleteOlderThan(thresholdTime);
+		LOG.info("Removed app-alive records: {}", removedAppAliveRecords);
+
 		lastPrunningTime = now;
+		LOG.info("All records: {}", appAliveEntryRepo.count() + appMetricsRepo.count());
 	}
 }

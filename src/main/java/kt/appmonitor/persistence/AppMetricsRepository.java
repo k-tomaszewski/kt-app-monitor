@@ -1,6 +1,5 @@
 package kt.appmonitor.persistence;
 
-import javax.persistence.TemporalType;
 import kt.appmonitor.data.AppMetrics;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

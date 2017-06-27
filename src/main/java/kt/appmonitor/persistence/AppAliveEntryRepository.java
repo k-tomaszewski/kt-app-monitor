@@ -5,6 +5,7 @@ import kt.appmonitor.data.AppAliveEntry;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.jpa.QueryHints;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +54,13 @@ public class AppAliveEntryRepository {
 			.createQuery("select count(x) from " + ENTITY_CLASS.getName() + " x", Long.class)
 			.getSingleResult();
 	}
+	
+	public int deleteOlderThan(DateTime thresholdTime) {
+		return getSession()
+			.createQuery("delete from " + ENTITY_CLASS.getName() + " x where x.aliveToTime < :thresholdTime")
+			.setParameter("thresholdTime", thresholdTime)
+			.executeUpdate();
+	}	
 	
 	private Session getSession() {
 		return sessionFactory.getCurrentSession();
