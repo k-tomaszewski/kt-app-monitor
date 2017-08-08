@@ -61,5 +61,9 @@
 		
 		<task:executor id="myExecutor" pool-size="1"/>
 		<task:annotation-driven executor="myExecutor"/>
+		
+		<bean id="maxDurationBetweenHeartbeats" class="org.joda.time.Duration" factory-method="standardMinutes">
+			<constructor-arg value="${max-minutes-beetween-heartbeats}"/>			
+		</bean>
     </beans>
 </beans>

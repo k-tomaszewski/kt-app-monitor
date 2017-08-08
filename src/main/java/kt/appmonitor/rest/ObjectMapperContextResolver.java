@@ -1,4 +1,4 @@
-package kt.appmonitor;
+package kt.appmonitor.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.ws.rs.ext.ContextResolver;

@@ -18,7 +18,6 @@ import org.joda.time.ReadableDuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +29,8 @@ public class HealthMonitorService {
 	private static final Logger LOG = LoggerFactory.getLogger(HealthMonitorService.class);
 	
 	private DateTime startTime;
+	
+	@Autowired
 	private ReadableDuration betweenHeartBeatsMaxDuration;
 	
 	@Autowired
@@ -37,9 +38,6 @@ public class HealthMonitorService {
 	
 	@Autowired
 	private AppMetricsRepository appMetricsRepo;
-	
-	@Value("${max-minutes-beetween-heartbeats}")
-	private int betweenHeartBeatsMaxMinutes;
 	
 	@Autowired
 	private Environment env;
@@ -56,7 +54,6 @@ public class HealthMonitorService {
 	@PostConstruct
 	public void postConstruct() {
 		startTime = DateTime.now();
-		betweenHeartBeatsMaxDuration = Duration.standardMinutes(betweenHeartBeatsMaxMinutes);
 		LOG.info("HealthMonitorService created at {}. betweenHeartBeatsMaxDuration: {}", startTime, betweenHeartBeatsMaxDuration);
 	}
 	

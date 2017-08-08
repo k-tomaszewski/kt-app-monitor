@@ -1,4 +1,4 @@
-package kt.appmonitor;
+package kt.appmonitor.rest;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;

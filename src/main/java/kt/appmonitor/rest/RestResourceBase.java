@@ -1,4 +1,4 @@
-package kt.appmonitor;
+package kt.appmonitor.rest;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
@@ -10,8 +10,7 @@ public abstract class RestResourceBase {
 	@Context
 	private ServletContext servletContext;
 	
-	protected HealthMonitorService getHealthMonitorService() {
-		return WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext)
-				.getBean(HealthMonitorService.class);
-	}	
+	protected <T> T getBean(Class<T> type) {
+		return WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext).getBean(type);
+	}
 }

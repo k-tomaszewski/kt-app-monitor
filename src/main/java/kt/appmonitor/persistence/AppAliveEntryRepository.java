@@ -21,22 +21,34 @@ public class AppAliveEntryRepository {
 	private SessionFactory sessionFactory;
 	
 	
+	@Transactional(readOnly = true)
 	public AppAliveEntry findLastAppAliveEntry(String appName) {
 		return getSession()
-			.createQuery("select x from " + ENTITY_CLASS.getName() + " x where x.appName = :appName "
-				+ "order by x.aliveToTime DESC", ENTITY_CLASS)
+			.createQuery("select x from " + ENTITY_CLASS.getName() + " x where x.appName = :appName"
+				+ " order by x.aliveToTime DESC", ENTITY_CLASS)
 			.setMaxResults(1)
 			.setParameter("appName", appName)
 			.getResultList()
 			.stream().findAny().orElse(null);
 	}
 	
+	@Transactional(readOnly = true)
 	public List<AppAliveEntry> findAppAliveEntries(String appName) {
 		return getSession()
-			.createQuery("select distinct x from " + ENTITY_CLASS.getName() + " x left outer join fetch x.metricsEntries where x.appName = :appName",
+			.createQuery("select distinct x from " + ENTITY_CLASS.getName()
+				+ " x left outer join fetch x.metricsEntries where x.appName = :appName"
+				+ " order by x.aliveToTime DESC",
 				ENTITY_CLASS)
 			.setParameter("appName", appName)
 			.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false)
+			.getResultList();
+	}
+	
+	@Transactional(readOnly = true)
+	public List<AppAliveEntry> findAllAppAliveEntries() {
+		return getSession()
+			.createQuery("select x from " + ENTITY_CLASS.getName() + " x order by x.aliveToTime DESC",
+				ENTITY_CLASS)
 			.getResultList();
 	}
 	
