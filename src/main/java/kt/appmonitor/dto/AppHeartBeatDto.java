@@ -2,9 +2,9 @@ package kt.appmonitor.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -48,37 +48,16 @@ public class AppHeartBeatDto implements SignedData {
 	@Override
 	public byte[] getDataBytes() {
 		try {
-			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-			try (DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream)) {
-				
-				// 1. Long, timestamp in millis
-				dataOutputStream.writeLong(timestamp.getMillis());
-				
-				// 2. Int, number of name-value pairs
-				if (metrics != null) {
-					dataOutputStream.writeInt(metrics.size());
-					
-					// for each name-value pair, sorted by names:
-					for (Map.Entry<String, Object> entry : metrics.entrySet()) {
-						
-						// 3. name as UTF
-						dataOutputStream.writeUTF(entry.getKey());
-						
-						// 4. value
-						final Object value = entry.getValue();
-						if (value instanceof Integer) {
-							dataOutputStream.writeInt((Integer)value);
-						} else if (value instanceof Long) {
-							dataOutputStream.writeLong((Long)value);
-						} else {
-							dataOutputStream.writeUTF(value.toString());
-						}
-					}
-				}
+			LinkedHashMap<String, Object> root = new LinkedHashMap<>();
+			root.put("timestamp", timestamp.getMillis());
+			if (metrics != null) {
+				root.put("metrics", metrics);
 			}
-			return byteArrayOutputStream.toByteArray();
-		} catch (Throwable ex) {
-			throw new RuntimeException("Cannot create byte representation of data for signature", ex);
+			final String data = (new ObjectMapper()).writeValueAsString(root);
+			return data.getBytes("UTF-8");
+			
+		} catch (Exception ex) {
+			throw new RuntimeException("Formating of data bytes to sign failed.", ex);
 		}
 	}	
 
@@ -111,18 +90,5 @@ public class AppHeartBeatDto implements SignedData {
 		}
 		txt.append("}");
 		return txt.toString();
-	}
-	
-	public static void main(String[] args) {
-		TreeMap<String, Object> metrics = new TreeMap<>();
-		metrics.put("temp", 16.3);
-		metrics.put("status", "ok");
-		
-		AppHeartBeatDto x = new AppHeartBeatDto();
-		x.setTimestamp(DateTime.now());
-		x.setSignature(new byte[]{1, 2, 3});
-		x.setMetrics(metrics);
-		
-		System.out.println(x);
 	}
 }
