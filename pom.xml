@@ -14,8 +14,8 @@
         <jersey.version>2.25.1</jersey.version>
         <jetty.version>9.4.5.v20170502</jetty.version>
         <spring.version>4.3.9.RELEASE</spring.version>
-		<bouncycastle.ver>1.56</bouncycastle.ver>
-		<hibernate.version>5.2.10.Final</hibernate.version>
+        <bouncycastle.ver>1.56</bouncycastle.ver>
+        <hibernate.version>5.2.10.Final</hibernate.version>
     </properties>
 
     <dependencyManagement>
@@ -31,11 +31,11 @@
     </dependencyManagement>
 
     <dependencies>
-		<dependency>
-			<groupId>com.rometools</groupId>
-			<artifactId>rome</artifactId>
-			<version>1.7.3</version>
-		</dependency>
+        <dependency>
+            <groupId>com.rometools</groupId>
+            <artifactId>rome</artifactId>
+            <version>1.7.3</version>
+        </dependency>
 		
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
@@ -71,24 +71,24 @@
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
         </dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-orm</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
 			  
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>${hibernate.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
 		
-		<!-- To store Joda DateTime using Hibernate 5 -->
-		<dependency>
-			<groupId>org.jadira.usertype</groupId>
-			<artifactId>usertype.core</artifactId>
-			<version>6.0.1.GA</version>
-		</dependency>						      
+        <!-- To store Joda DateTime using Hibernate 5 -->
+        <dependency>
+            <groupId>org.jadira.usertype</groupId>
+            <artifactId>usertype.core</artifactId>
+            <version>6.0.1.GA</version>
+        </dependency>						      
         
         <dependency>
             <groupId>joda-time</groupId>
@@ -140,12 +140,12 @@
             <version>2.3.9</version>
         </dependency>
 		
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
