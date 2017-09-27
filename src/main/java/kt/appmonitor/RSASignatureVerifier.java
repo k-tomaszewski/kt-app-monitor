@@ -6,17 +6,16 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.function.Supplier;
 import kt.common.crypto.KeyUtil;
+import net.iharder.Base64;
 import org.apache.commons.lang3.Validate;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.signers.RSADigestSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 
-@Profile("prod")
 @Component
 public class RSASignatureVerifier implements SignatureVerifier {
 	
@@ -56,7 +55,7 @@ public class RSASignatureVerifier implements SignatureVerifier {
 	}
 	
 	static void initSignerWithData(RSADigestSigner signer, byte[] data) {
-		LOG.debug("Signed data length: {}", data.length);
+		LOG.info("Signed data: {}", Base64.encodeBytes(data));
 		signer.update(data, 0, data.length);
 	}
 	

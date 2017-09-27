@@ -1,6 +1,5 @@
 package kt.appmonitor.rest;
 
-import kt.appmonitor.rest.RestResourceBase;
 import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

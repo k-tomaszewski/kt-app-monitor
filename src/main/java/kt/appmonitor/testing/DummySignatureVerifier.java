@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 
-@Profile("dev")
-@Component
+//@Profile("dev")
+//@Component
 public class DummySignatureVerifier implements SignatureVerifier {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(DummySignatureVerifier.class);
