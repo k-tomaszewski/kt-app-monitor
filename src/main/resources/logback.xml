@@ -9,11 +9,18 @@
         </encoder>
     </appender>
 
+    <appender name="CUSTOM" class="kt.common.logback.InMemoryCollectingAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg</pattern>
+        </layout>        
+    </appender>
+
     <root level="WARN">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="CUSTOM"/>
     </root>
     
     <logger name="kt.appmonitor" level="DEBUG"/>
-	<logger name="org.hibernate" level="INFO"/>
+    <logger name="org.hibernate" level="INFO"/>
     
 </configuration>
