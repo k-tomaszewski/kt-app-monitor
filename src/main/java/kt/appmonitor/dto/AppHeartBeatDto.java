@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import javax.xml.bind.DatatypeConverter;
 import kt.appmonitor.SignedData;
 import kt.common.jackson.ByteArrayBase64Deserializer;
+import net.iharder.Base64;
 import org.joda.time.DateTime;
 
 
@@ -84,7 +84,7 @@ public class AppHeartBeatDto implements SignedData {
 		}
 		txt.append(", signature: ");
 		if (signature != null) {
-			txt.append("0x").append(DatatypeConverter.printHexBinary(signature));
+			txt.append(Base64.encodeBytes(signature));
 		} else {
 			txt.append("n/a");
 		}
