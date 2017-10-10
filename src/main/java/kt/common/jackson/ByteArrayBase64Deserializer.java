@@ -23,7 +23,7 @@ public class ByteArrayBase64Deserializer extends StdScalarDeserializer<byte[]> {
 		} else if (currentToken == JsonToken.VALUE_NULL) {
 			return null;
 		}
-		throw deserializationContext.wrongTokenException(jsonParser, currentToken, "Invalid date & time value (it should be a number)");		
+		throw deserializationContext.wrongTokenException(jsonParser, currentToken, "Invalid byte array value");		
 	}
 	
 }
