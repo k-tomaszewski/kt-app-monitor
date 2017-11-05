@@ -9,12 +9,12 @@ import javax.annotation.PostConstruct;
 import kt.appmonitor.data.AppAliveEntry;
 import kt.appmonitor.data.AppMetrics;
 import kt.appmonitor.dto.AppHeartBeatDto;
+import kt.appmonitor.dto.UpdateResponseDto;
 import kt.appmonitor.persistence.AppAliveEntryRepository;
 import kt.appmonitor.persistence.AppMetricsRepository;
 import org.apache.commons.lang3.Validate;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-import org.joda.time.ReadableDuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class HealthMonitorService {
 	private DateTime startTime;
 	
 	@Autowired
-	private ReadableDuration betweenHeartBeatsMaxDuration;
+	private Duration betweenHeartBeatsMaxDuration;
 	
 	@Autowired
 	private AppAliveEntryRepository appAliveEntryRepo;
@@ -58,7 +58,7 @@ public class HealthMonitorService {
 	}
 	
 	@Transactional
-	public void updateAppAliveEntry(String appName, AppHeartBeatDto heartBeatDto) {
+	public UpdateResponseDto updateAppAliveEntry(String appName, AppHeartBeatDto heartBeatDto) {
 		LOG.info("updateAppAliveEntry => appName: {}, heartBeatDto: {}", appName, heartBeatDto);
 		
 		final AppAliveEntry lastEntry = appAliveEntryRepo.findLastAppAliveEntry(appName);
@@ -92,6 +92,7 @@ public class HealthMonitorService {
 		}
 		
 		dbPrunningStrategy.run();	// this should run async
+		return new UpdateResponseDto(betweenHeartBeatsMaxDuration.getStandardMinutes() / 2);
 	}
 	
 	String generateJson(Object obj) {

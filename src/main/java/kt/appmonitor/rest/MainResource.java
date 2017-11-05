@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import kt.appmonitor.HealthMonitorService;
 import kt.appmonitor.data.AppAliveEntry;
 import kt.appmonitor.dto.AppHeartBeatDto;
+import kt.appmonitor.dto.UpdateResponseDto;
 
 
 @Path("v1")
@@ -22,8 +23,8 @@ public class MainResource extends RestResourceBase {
 	@PUT
 	@Path("{appName}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void updateAppAlive(@PathParam("appName") String appName, AppHeartBeatDto appHeartBeat) {
-		getHealthMonitorService().updateAppAliveEntry(appName, appHeartBeat);
+	public UpdateResponseDto updateAppAlive(@PathParam("appName") String appName, AppHeartBeatDto appHeartBeat) {
+		return getHealthMonitorService().updateAppAliveEntry(appName, appHeartBeat);
 	}
 	
 	@GET

@@ -37,33 +37,33 @@
     
         <context:property-placeholder location="classpath:config.properties"/>
 		
-		<tx:annotation-driven/> 
+        <tx:annotation-driven/> 
         
         <jdbc:initialize-database data-source="dataSource" enabled="true">
             <jdbc:script location="classpath:db-schema-pgsql.sql"/>
         </jdbc:initialize-database>
 		
-		<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
-			<property name="dataSource" ref="dataSource"/>
-			<property name="packagesToScan" value="kt.appmonitor.data"/>
-			<property name="hibernateProperties">
-				<props>
-					<prop key="jadira.usertype.autoRegisterUserTypes">true</prop>
-				</props>
-			</property>
-		</bean>		
+        <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+            <property name="dataSource" ref="dataSource"/>
+            <property name="packagesToScan" value="kt.appmonitor.data"/>
+            <property name="hibernateProperties">
+                <props>
+                    <prop key="jadira.usertype.autoRegisterUserTypes">true</prop>
+                </props>
+            </property>
+        </bean>		
     
-		<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
-			<property name="sessionFactory" ref="sessionFactory" />
-		</bean>
+        <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+            <property name="sessionFactory" ref="sessionFactory" />
+        </bean>
 		
-		<bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+        <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
 		
-		<task:executor id="myExecutor" pool-size="1"/>
-		<task:annotation-driven executor="myExecutor"/>
+        <task:executor id="myExecutor" pool-size="1"/>
+        <task:annotation-driven executor="myExecutor"/>
 		
-		<bean id="maxDurationBetweenHeartbeats" class="org.joda.time.Duration" factory-method="standardMinutes">
-			<constructor-arg value="${max-minutes-beetween-heartbeats}"/>			
-		</bean>
+        <bean id="maxDurationBetweenHeartbeats" class="org.joda.time.Duration" factory-method="standardMinutes">
+            <constructor-arg value="${max-minutes-beetween-heartbeats}"/>			
+        </bean>
     </beans>
 </beans>
