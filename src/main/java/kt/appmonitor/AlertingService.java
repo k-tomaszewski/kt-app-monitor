@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AlertingService {
 
-	static final String HEARTBEAT_LOST_TITLE_PATTERN = "Heartbeat lost: %s";
-	static final String HEARTBEAT_RECOVERED_TITLE_PATTERN = "Heartbeat appeared: %s";
+	static final String HEARTBEAT_LOST_TITLE_PATTERN = "%s heartbeat lost!";
+	static final String HEARTBEAT_RECOVERED_TITLE_PATTERN = "%s heartbeat appeared.";
 
 	private static final Logger LOG = LoggerFactory.getLogger(AlertingService.class);
 
@@ -56,10 +56,10 @@ public class AlertingService {
 		for (AppAliveEntry appAliveEntry : appAliveEntries) {
 			Duration fromLastAliveTimeToRefTime = new Duration(appAliveEntry.getAliveToTime(), refTime);
 			if (fromLastAliveTimeToRefTime.isLongerThan(maxDurationBetweenHeartbeats)) {
-				addHeartbeatLost(appName, appAliveEntry.getAliveToTime().plus(maxDurationBetweenHeartbeats), appAliveEntry, alerts);
 				if (prevAppAliveEntry != null) {
 					addHeartbeatRecovered(appName, prevAppAliveEntry, alerts);
-				}
+				}				
+				addHeartbeatLost(appName, appAliveEntry.getAliveToTime().plus(maxDurationBetweenHeartbeats), appAliveEntry, alerts);
 			}
 			refTime = appAliveEntry.getAliveFromTime();
 			prevAppAliveEntry = appAliveEntry;
