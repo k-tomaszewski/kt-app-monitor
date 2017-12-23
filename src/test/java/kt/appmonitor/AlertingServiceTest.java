@@ -28,7 +28,7 @@ public class AlertingServiceTest {
 		
 		// then
 		Assert.assertNotNull(alerts);
-		Assert.assertEquals(1, alerts.size());
+		Assert.assertEquals(2, alerts.size());
 		
 		AlertDto alert = alerts.get(0);
 		Assert.assertNotNull(alert);

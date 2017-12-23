@@ -49,8 +49,7 @@ public class FeedResource extends RestResourceBase {
 		feed.setFeedType("atom_1.0");
 		feed.setEncoding("UTF-8");
 		feed.setTitle(String.format("Monitoring of %s (kt-app-monitor)", appName));
-		feed.setDescription(String.format("Status notifications from the application '%s' by kt-app-monitor.",
-			appName));
+		feed.setDescription(String.format("Status notifications from '%s' application by kt-app-monitor.", appName));
 		feed.setLink("https://github.com/k-tomaszewski/kt-app-monitor");
 
 		// entries
