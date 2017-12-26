@@ -5,6 +5,7 @@ import java.util.List;
 import kt.appmonitor.data.AppAliveEntry;
 import kt.appmonitor.dto.AlertDto;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,7 +25,7 @@ public class AlertingServiceTest {
 		
 		// when
 		List<AlertDto> alerts = AlertingService.generateAlerts(
-			"app-name", appAliveEntries, Duration.standardMinutes(30), aliveEnd.plusMinutes(31));
+			"app-name", appAliveEntries, Duration.standardMinutes(30), aliveEnd.plusMinutes(31), DateTimeZone.UTC);
 		
 		// then
 		Assert.assertNotNull(alerts);

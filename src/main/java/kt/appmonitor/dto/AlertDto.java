@@ -7,15 +7,17 @@ public class AlertDto {
 	
 	private String appName;
 	private DateTime eventTime;
-	private String title;
+	private AlertType type;
 	private Object details;
+	private String id;
 
 	
-	public AlertDto(String appName, DateTime eventTime, String title, Object details) {
+	public AlertDto(String appName, DateTime eventTime, AlertType type, Object details, String id) {
 		this.appName = appName;
 		this.eventTime = eventTime;
-		this.title = title;
+		this.type = type;
 		this.details = details;
+		this.id = id;
 	}
 
 	public String getAppName() {
@@ -26,11 +28,15 @@ public class AlertDto {
 		return eventTime;
 	}
 
-	public String getTitle() {
-		return title;
+	public AlertType getType() {
+		return type;
 	}
 
 	public Object getDetails() {
 		return details;
+	}
+
+	public String getId() {
+		return id;
 	}
 }
