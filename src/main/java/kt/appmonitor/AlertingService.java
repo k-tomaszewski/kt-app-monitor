@@ -3,10 +3,12 @@ package kt.appmonitor;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import kt.appmonitor.data.AppAliveEntry;
 import kt.appmonitor.dto.AlertDto;
 import kt.appmonitor.dto.AlertType;
 import kt.appmonitor.persistence.AppAliveEntryRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -34,13 +36,14 @@ public class AlertingService {
 	private ReadableDuration maxDurationBetweenHeartbeats;
 
 	
-	public List<AlertDto> getAlertsFor(String appName, DateTimeZone timeZone) {
+	public List<AlertDto> getAlertsFor(String appName, Locale locale) {
+		DateTimeZone timeZone = getTimeZoneForLocale(locale);
 		return generateAlerts(appName, appAliveEntryRepo.findAppAliveEntries(appName),
-				maxDurationBetweenHeartbeats, DateTime.now(), timeZone);
+				maxDurationBetweenHeartbeats, DateTime.now(), timeZone, locale);
 	}
 
 	static List<AlertDto> generateAlerts(String appName, List<AppAliveEntry> appAliveEntries,
-			ReadableDuration maxDurationBetweenHeartbeats, DateTime now, DateTimeZone timeZone) {
+			ReadableDuration maxDurationBetweenHeartbeats, DateTime now, DateTimeZone timeZone, Locale locale) {
 
 		Validate.notNull(now, "The current time must be given");
 
@@ -52,7 +55,7 @@ public class AlertingService {
 
 		DateTime refTime = now;
 		AppAliveEntry prevAppAliveEntry = null;
-		DateTimeFormatter formatter = DateTimeFormat.fullDateTime().withZone(timeZone);
+		DateTimeFormatter formatter = DateTimeFormat.fullDateTime().withLocale(locale).withZone(timeZone);
 
 		for (AppAliveEntry appAliveEntry : appAliveEntries) {
 			Duration fromLastAliveTimeToRefTime = new Duration(appAliveEntry.getAliveToTime(), refTime);
@@ -91,4 +94,17 @@ public class AlertingService {
 	static String makeId(Integer appAliveEntryId, AlertType type) {
 		return appAliveEntryId + "/" + type;
 	}
+
+	// TODO better implementation
+	static DateTimeZone getTimeZoneForLocale(Locale locale) {
+		final String countryNameEng = locale.getDisplayCountry(Locale.ROOT);
+		if (StringUtils.isNotBlank(countryNameEng)) {
+			try {
+				return DateTimeZone.forID(countryNameEng);
+			} catch (IllegalArgumentException e) {
+				LOG.warn("Cannot select time zone by id. " + e.getMessage());
+			}
+		}
+		return DateTimeZone.UTC;
+	}	
 }

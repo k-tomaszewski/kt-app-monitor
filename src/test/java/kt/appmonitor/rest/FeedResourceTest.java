@@ -20,17 +20,4 @@ public class FeedResourceTest {
 		Assert.assertEquals("pl", detectedLocale.getLanguage());
 		Assert.assertTrue("Country name from Locale object cannot be empty.", StringUtils.isNotBlank(detectedLocale.getCountry()));
 	}
-	
-	@Test
-	public void shouldSelectTimeZoneForPolishLanguage() {
-		// given
-		Locale plLoc = FeedResource.readLocaleFromAcceptLangHeader("pl");
-		
-		// when
-		DateTimeZone dtz = FeedResource.getTimeZoneForLocale(plLoc);
-		
-		// then
-		Assert.assertNotNull(dtz);
-		System.out.println("Selected time zone: " + dtz);
-	}
 }

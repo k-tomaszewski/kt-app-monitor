@@ -2,8 +2,10 @@ package kt.appmonitor;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import kt.appmonitor.data.AppAliveEntry;
 import kt.appmonitor.dto.AlertDto;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -25,7 +27,7 @@ public class AlertingServiceTest {
 		
 		// when
 		List<AlertDto> alerts = AlertingService.generateAlerts(
-			"app-name", appAliveEntries, Duration.standardMinutes(30), aliveEnd.plusMinutes(31), DateTimeZone.UTC);
+			"app-name", appAliveEntries, Duration.standardMinutes(30), aliveEnd.plusMinutes(31), DateTimeZone.UTC, Locale.ROOT);
 		
 		// then
 		Assert.assertNotNull(alerts);
@@ -35,4 +37,19 @@ public class AlertingServiceTest {
 		Assert.assertNotNull(alert);
 		Assert.assertEquals(aliveEnd.plus(Duration.standardMinutes(30)), alert.getEventTime());
 	}
+	
+	@Test
+	public void shouldSelectTimeZoneForPolishLanguage() {
+		// given
+		Locale plLocale = Arrays.stream(Locale.getAvailableLocales()).filter(loc -> "PL".equals(loc.getCountry())).findFirst().orElse(null);
+		Assert.assertNotNull(plLocale);
+		Assert.assertTrue(StringUtils.isNotBlank(plLocale.getCountry()));
+		
+		// when
+		DateTimeZone dtz = AlertingService.getTimeZoneForLocale(plLocale);
+		
+		// then
+		Assert.assertNotNull(dtz);
+		Assert.assertEquals("Europe/Warsaw", dtz.getID());
+	}	
 }
