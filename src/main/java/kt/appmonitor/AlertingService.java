@@ -8,7 +8,7 @@ import kt.appmonitor.data.AppAliveEntry;
 import kt.appmonitor.dto.AlertDto;
 import kt.appmonitor.dto.AlertType;
 import kt.appmonitor.persistence.AppAliveEntryRepository;
-import org.apache.commons.lang3.StringUtils;
+import kt.common.Locales;
 import org.apache.commons.lang3.Validate;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -37,9 +37,8 @@ public class AlertingService {
 
 	
 	public List<AlertDto> getAlertsFor(String appName, Locale locale) {
-		DateTimeZone timeZone = getTimeZoneForLocale(locale);
 		return generateAlerts(appName, appAliveEntryRepo.findAppAliveEntries(appName),
-				maxDurationBetweenHeartbeats, DateTime.now(), timeZone, locale);
+				maxDurationBetweenHeartbeats, DateTime.now(), Locales.getDefaultTimeZoneFor(locale), locale);
 	}
 
 	static List<AlertDto> generateAlerts(String appName, List<AppAliveEntry> appAliveEntries,
@@ -93,18 +92,5 @@ public class AlertingService {
 	
 	static String makeId(Integer appAliveEntryId, AlertType type) {
 		return appAliveEntryId + "/" + type;
-	}
-
-	// TODO better implementation
-	static DateTimeZone getTimeZoneForLocale(Locale locale) {
-		final String countryNameEng = locale.getDisplayCountry(Locale.ROOT);
-		if (StringUtils.isNotBlank(countryNameEng)) {
-			try {
-				return DateTimeZone.forID(countryNameEng);
-			} catch (IllegalArgumentException e) {
-				LOG.warn("Cannot select time zone by id. " + e.getMessage());
-			}
-		}
-		return DateTimeZone.UTC;
 	}	
 }
