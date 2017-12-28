@@ -76,14 +76,14 @@ public class AlertingService {
 	}
 
 	static void addHeartbeatLost(String appName, DateTime eventTime, AppAliveEntry appAliveEntry, List<AlertDto> alerts, DateTimeFormatter formatter) {
-		alerts.add(new AlertDto(appName, eventTime, AlertType.HEARTBEAT_LOST,
+		alerts.add(new AlertDto(appName, eventTime, eventTime, AlertType.HEARTBEAT_LOST,
 				String.format("The last heartbeat was recorded at %s.", formatter.print(appAliveEntry.getAliveToTime())),
 				makeId(appAliveEntry.getId(), AlertType.HEARTBEAT_LOST))
 		);
 	}
 
 	static void addHeartbeatRecovered(String appName, AppAliveEntry appAliveEntry, List<AlertDto> alerts, DateTimeFormatter formatter) {
-		alerts.add(new AlertDto(appName, appAliveEntry.getAliveFromTime(), AlertType.HEARTBEAT_RECOVERED,
+		alerts.add(new AlertDto(appName, appAliveEntry.getAliveFromTime(), appAliveEntry.getAliveToTime(), AlertType.HEARTBEAT_RECOVERED,
 				String.format("The last heartbeat was recorded at %s. The first heartbeat: %s.",
 						formatter.print(appAliveEntry.getAliveToTime()), formatter.print(appAliveEntry.getAliveFromTime())),
 				makeId(appAliveEntry.getId(), AlertType.HEARTBEAT_RECOVERED))

@@ -5,16 +5,18 @@ import org.joda.time.DateTime;
 
 public class AlertDto {
 	
-	private String appName;
-	private DateTime eventTime;
-	private AlertType type;
-	private Object details;
-	private String id;
+	private final String appName;
+	private final DateTime eventTime;
+	private final DateTime updateTime;
+	private final AlertType type;
+	private final Object details;
+	private final String id;
 
 	
-	public AlertDto(String appName, DateTime eventTime, AlertType type, Object details, String id) {
+	public AlertDto(String appName, DateTime eventTime, DateTime updateTime, AlertType type, Object details, String id) {
 		this.appName = appName;
 		this.eventTime = eventTime;
+		this.updateTime = updateTime;
 		this.type = type;
 		this.details = details;
 		this.id = id;
@@ -26,6 +28,10 @@ public class AlertDto {
 
 	public DateTime getEventTime() {
 		return eventTime;
+	}
+
+	public DateTime getUpdateTime() {
+		return updateTime;
 	}
 
 	public AlertType getType() {

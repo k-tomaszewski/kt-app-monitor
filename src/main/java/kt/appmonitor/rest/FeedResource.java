@@ -10,7 +10,7 @@ import com.rometools.rome.io.SyndFeedOutput;
 import java.io.BufferedWriter;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import javax.ws.rs.GET;
@@ -22,6 +22,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import kt.appmonitor.AlertingService;
+import kt.appmonitor.dto.AlertDto;
+import kt.appmonitor.dto.AlertType;
 import kt.common.Locales;
 
 
@@ -57,7 +59,8 @@ public class FeedResource extends RestResourceBase {
 		feed.setUri("kt-app-monitor.herokuapp.com/" + appName);
 
 		// entries
-		feed.setEntries(getAlertingService().getAlertsFor(appName, locale).stream().map(alert -> {
+		List<AlertDto> alerts = getAlertingService().getAlertsFor(appName, locale);
+		feed.setEntries(alerts.stream().map(alert -> {
 			SyndEntry entry = new SyndEntryImpl();
 			entry.setUri(feed.getUri() + '/' + alert.getId());
 			entry.setTitle(alert.getType().getTitle());
@@ -71,6 +74,10 @@ public class FeedResource extends RestResourceBase {
 			}
 			return entry;
 		}).collect(Collectors.toList()));
+		
+		if (!alerts.isEmpty() && alerts.get(0).getType() == AlertType.HEARTBEAT_RECOVERED) {
+			feed.getEntries().get(0).setUpdatedDate(alerts.get(0).getUpdateTime().toDate());
+		}
 
 		return feed;
 	}
