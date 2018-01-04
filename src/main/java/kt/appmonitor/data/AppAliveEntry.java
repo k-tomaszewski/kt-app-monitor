@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import org.joda.time.DateTime;
@@ -53,6 +54,7 @@ public class AppAliveEntry {
 	private int heartBeatCount;
 	
 	@OneToMany(mappedBy = "appAliveEntry", cascade = CascadeType.ALL, orphanRemoval = true)	// lazy
+	@OrderBy("dataTime ASC")
     private List<AppMetrics> metricsEntries = new ArrayList<>();
 
 	
