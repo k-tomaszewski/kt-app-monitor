@@ -64,7 +64,7 @@ public class Locales {
 	 */
 	public static Locale selectLocaleByAcceptLanguage(String acceptLang) {
 		
-		if (StringUtils.isBlank(acceptLang) || (acceptLang != null && "*".equals(acceptLang))) {
+		if (StringUtils.isBlank(acceptLang) || "*".equals(acceptLang)) {
 			acceptLang = DEFAULT_LANG_CODE;
 		}
 		
